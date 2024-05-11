@@ -13,6 +13,7 @@ router.post("/signup", async (req, res) => {
       username: req.body.username,
       password: hashedPassword,
       role: req.body.role,
+      imageUrl: req.body.imageUrl,
     });
     const newUser = await user.save();
     const data = {
