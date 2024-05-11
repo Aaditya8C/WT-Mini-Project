@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+require("dotenv").config();
 
 // Signup API
 router.post("/signup", async (req, res) => {
@@ -14,8 +15,17 @@ router.post("/signup", async (req, res) => {
       role: req.body.role,
     });
     const newUser = await user.save();
-    res.status(201).json(newUser);
+    const data = {
+      username: newUser.username,
+      role: newUser.role,
+    };
+    res.status(201).send({
+      status: true,
+      message: "User created successfully",
+      data: data,
+    });
   } catch (err) {
+    // console.log(err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -34,8 +44,12 @@ router.post("/login", async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    const token = jwt.sign({ userId: user._id }, "secretkey");
-    res.json({ token });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    res.status(200).send({
+      status: true,
+      message: "User logged in successfully",
+      data: token,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
