@@ -5,27 +5,9 @@ const Poll = require("../models/Poll");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
+const authenticateToken = require("../authenticateToken");
 require("dotenv").config();
 // Middleware to verify token
-const authenticateToken = asyncHandler(async (req, res, next) => {
-  let token;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.userId).select("-password");
-      next();
-    } catch (e) {
-      return res.status(403).json({ message: "Forbidden" });
-    }
-  } else {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-});
 
 // Create Poll API
 router.post("/polls", authenticateToken, async (req, res) => {
@@ -94,6 +76,8 @@ router.get("/fetchPolls", async (req, res) => {
 
 // Get Polls for Specific User API
 router.get("/user/polls", authenticateToken, async (req, res) => {
+  console.log(req.user);
+
   try {
     const polls = await Poll.find({ user: req.user.userId });
     res.json(polls);

@@ -4,9 +4,10 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const pollRoutes = require("./routes/pollRoutes");
 require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 const MONGOURI = process.env.MONGOURI;
 
 // Connect to MongoDB
@@ -22,6 +23,7 @@ db.once("open", function () {
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors());
 
 // Routes
 app.use("/api", userRoutes);
