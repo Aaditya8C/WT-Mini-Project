@@ -11,11 +11,13 @@ require("dotenv").config();
 
 // Create Poll API
 router.post("/polls", authenticateToken, async (req, res) => {
+  console.log(req.user._id);
   const poll = new Poll({
-    user: req.user.userId,
+    user: req.user._id,
     question: req.body.question,
     options: req.body.options,
     votes: Array(req.body.options.length).fill(0), // Initialize votes count to zero
+    category: req.body.category,
   });
   try {
     const newPoll = await poll.save();
@@ -38,7 +40,7 @@ router.post("/polls", authenticateToken, async (req, res) => {
 });
 
 // Vote for Poll API
-router.put("/polls/:id/vote", authenticateToken, async (req, res) => {
+router.put("/polls/:id/vote", async (req, res) => {
   try {
     const poll = await Poll.findById(req.params.id);
     if (!poll) {
@@ -61,7 +63,7 @@ router.put("/polls/:id/vote", authenticateToken, async (req, res) => {
 // Get all Polls API
 router.get("/fetchPolls", async (req, res) => {
   try {
-    const polls = await Poll.find();
+    const polls = await Poll.find().populate("user");
     // res.json(polls);
 
     res.status(200).send({
@@ -76,10 +78,8 @@ router.get("/fetchPolls", async (req, res) => {
 
 // Get Polls for Specific User API
 router.get("/user/polls", authenticateToken, async (req, res) => {
-  console.log(req.user);
-
   try {
-    const polls = await Poll.find({ user: req.user.userId });
+    const polls = await Poll.find({ user: req.user._id }).populate("user");
     res.json(polls);
   } catch (err) {
     res.status(500).json({ message: err.message });

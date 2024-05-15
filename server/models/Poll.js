@@ -5,6 +5,7 @@ const pollSchema = new mongoose.Schema({
   question: String,
   options: [String],
   votes: [Number], // Count for each option
+  category: { type: String },
 });
 
 module.exports = mongoose.model("Poll", pollSchema);
