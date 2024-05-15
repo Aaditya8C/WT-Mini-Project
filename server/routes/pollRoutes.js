@@ -63,7 +63,7 @@ router.put("/polls/:id/vote", async (req, res) => {
 // Get all Polls API
 router.get("/fetchPolls", async (req, res) => {
   try {
-    const polls = await Poll.find().populate("user");
+    const polls = await Poll.find().populate("user").sort({ createdAt: -1 });
     // res.json(polls);
 
     res.status(200).send({
