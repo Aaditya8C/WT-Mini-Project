@@ -9,6 +9,13 @@ require("dotenv").config();
 // Signup API
 router.post("/signup", async (req, res) => {
   try {
+    const alreadyUser = await User.findOne({ email: req.body.email });
+    if (alreadyUser) {
+      return res.status(200).send({
+        status: false,
+        message: "User already exists",
+      });
+    }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({
       email: req.body.email,

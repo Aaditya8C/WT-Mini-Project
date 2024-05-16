@@ -80,7 +80,35 @@ router.get("/fetchPolls", async (req, res) => {
 router.get("/user/polls", authenticateToken, async (req, res) => {
   try {
     const polls = await Poll.find({ user: req.user._id }).populate("user");
-    res.json(polls);
+    res.status(200).send({
+      status: true,
+      message: "Fetched users polls",
+      data: polls,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all Polls API by category
+router.get("/fetchPolls/:category", async (req, res) => {
+  try {
+    const category = req.params.category; // Get the category from the URL parameters
+    let polls;
+
+    if (category) {
+      polls = await Poll.find({ category })
+        .populate("user")
+        .sort({ createdAt: -1 });
+    } else {
+      polls = await Poll.find().populate("user").sort({ createdAt: -1 });
+    }
+
+    res.status(200).send({
+      status: true,
+      message: "Fetched all polls",
+      data: polls,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
